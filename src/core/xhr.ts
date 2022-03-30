@@ -1,6 +1,6 @@
-import { createError } from "./helpers/error";
-import { parseHeaders } from "./helpers/hearders";
-import { AxiosConfig, AxiosPromise, AxiosResponse } from "./types";
+import { createError } from "../helpers/error";
+import { parseHeaders } from "../helpers/hearders";
+import { AxiosConfig, AxiosPromise, AxiosResponse } from "../types";
 
 export default function xhr(config: AxiosConfig) :AxiosPromise {
   return new Promise((resolve, reject) => {
@@ -14,7 +14,7 @@ export default function xhr(config: AxiosConfig) :AxiosPromise {
   if(timeout) {
     request.timeout = timeout
   }
-  request.open(method.toUpperCase(), url, true)
+  request.open(method.toUpperCase(), url!, true)
   function handleResponse(response: AxiosResponse) {
     if(response.status >= 200 && response.status < 300) {
       resolve(response)
