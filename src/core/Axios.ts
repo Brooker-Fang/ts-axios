@@ -8,6 +8,7 @@ import {
 } from '../types'
 import dispatchRequest from './dispatchRequest'
 import InterceptorManager from './InterceptorManager'
+import mergeConfig from './mergeConfig'
 // import mergeConfig from './mergeConfig'
 
 interface Interceptors {
@@ -41,8 +42,7 @@ export default class Axios {
     } else {
       config = url
     }
-
-    // config = mergeConfig(this.defaults, config)
+    config = mergeConfig(this.defaults, config)
     // config.MethodType = config.MethodType.toLowerCase()
 
     const chain: PromiseChain<any>[] = [
