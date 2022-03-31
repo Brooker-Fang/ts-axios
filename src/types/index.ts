@@ -6,7 +6,9 @@ export type MethodType =
   'put' | 'PUT' |
   'patch' | 'PATCH' |
   'options' | 'OPTIONS'
-
+  export interface AxiosTransformer {
+    (data: any, headers?: any): any
+  }
 export interface AxiosConfig {
   url?: string,
   method?: MethodType,
@@ -15,6 +17,9 @@ export interface AxiosConfig {
   headers?: any
   responseType?: XMLHttpRequestResponseType
   timeout?: number
+  transformRequest?: AxiosTransformer | AxiosTransformer[]
+  transformResponse?: AxiosTransformer | AxiosTransformer[]
+  [propName: string]: any
 }
 
 export interface AxiosResponse<T = any> {
@@ -67,7 +72,9 @@ export interface AxiosInstance extends Axios {
 
   <T = any>(url: string, config?: AxiosConfig): AxiosPromise<T>
 }
-
+export interface AxiosStatic extends AxiosInstance{
+  create(config?: AxiosConfig): AxiosInstance
+}
 export interface AxiosInterceptorManager<T> {
   use(resolve: ResolveFn<T>, reject?: RejectFn):number
   eject(id: number): void

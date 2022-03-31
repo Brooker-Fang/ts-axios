@@ -1,5 +1,6 @@
 import { AxiosConfig } from './types'
 import { transformRequest, transformResponse } from './helpers/data'
+import { processHeaders } from './helpers/hearders'
 
 const defaults: AxiosConfig = {
   method: 'get',
@@ -16,18 +17,18 @@ const defaults: AxiosConfig = {
     }
   },
 
-  // transformRequest: [
-  //   function(data: any, headers: any): any {
-  //     processHeaders(headers, data)
-  //     return transformRequest(data)
-  //   }
-  // ],
+  transformRequest: [
+    function(data: any, headers: any): any {
+      processHeaders(headers, data)
+      return transformRequest(data)
+    }
+  ],
 
-  // transformResponse: [
-  //   function(data: any): any {
-  //     return transformResponse(data)
-  //   }
-  // ],
+  transformResponse: [
+    function(data: any): any {
+      return transformResponse(data)
+    }
+  ],
 
   // validateStatus(status: number): boolean {
   //   return status >= 200 && status < 300
