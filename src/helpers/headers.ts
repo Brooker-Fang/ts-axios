@@ -1,5 +1,5 @@
-import { isPlainObject, deepMerge } from './uitls'
-import { MethodType } from '../types'
+import { isPlainObject, deepMerge } from './util'
+import { Method } from '../types'
 
 function normalizeHeaderName(headers: any, normalizedName: string): void {
   if (!headers) {
@@ -43,7 +43,7 @@ export function parseHeaders(headers: string): any {
   return parsed
 }
 
-export function flattenHeaders(headers: any, method: MethodType): any {
+export function flattenHeaders(headers: any, method: Method): any {
   if (!headers) {
     return headers
   }

@@ -1,26 +1,40 @@
-export type MethodType = 
-  'get' | 'GET' | 
-  'delete' | 'Delete' | 
-  'head' | 'HEAD' | 
-  'post' | 'POST' |
-  'put' | 'PUT' |
-  'patch' | 'PATCH' |
-  'options' | 'OPTIONS'
-  export interface AxiosTransformer {
-    (data: any, headers?: any): any
-  }
-export interface AxiosConfig {
-  url?: string,
-  method?: MethodType,
-  data?: any,
+export type Method =
+  | 'get'
+  | 'GET'
+  | 'delete'
+  | 'DELETE'
+  | 'head'
+  | 'HEAD'
+  | 'options'
+  | 'OPTIONS'
+  | 'post'
+  | 'POST'
+  | 'put'
+  | 'PUT'
+  | 'patch'
+  | 'PATCH'
+
+export interface AxiosRequestConfig {
+  url?: string
+  method?: Method
+  data?: any
   params?: any
   headers?: any
   responseType?: XMLHttpRequestResponseType
   timeout?: number
   transformRequest?: AxiosTransformer | AxiosTransformer[]
   transformResponse?: AxiosTransformer | AxiosTransformer[]
-
   cancelToken?: CancelToken
+  withCredentials?: boolean
+  xsrfCookieName?: string
+  xsrfHeaderName?: string
+  onDownloadProgress?: (e: ProgressEvent) => void
+  onUploadProgress?: (e: ProgressEvent) => void
+  auth?: AxiosBasicCredentials
+  validateStatus?: (status: number) => boolean
+  paramsSerializer?: (params: any) => string
+  baseURL?: string
+
   [propName: string]: any
 }
 
@@ -29,86 +43,123 @@ export interface AxiosResponse<T = any> {
   status: number
   statusText: string
   headers: any
-  config: AxiosConfig
+  config: AxiosRequestConfig
   request: any
 }
 
 export interface AxiosPromise<T = any> extends Promise<AxiosResponse<T>> {}
 
 export interface AxiosError extends Error {
-  config: AxiosConfig
-  code?: string | null
+  config: AxiosRequestConfig
+  code?: string
   request?: any
   response?: AxiosResponse
   isAxiosError: boolean
 }
 
 export interface Axios {
-  defaults: AxiosConfig
+  defaults: AxiosRequestConfig
   interceptors: {
-    request: AxiosInterceptorManager<AxiosConfig>
+    request: AxiosInterceptorManager<AxiosRequestConfig>
     response: AxiosInterceptorManager<AxiosResponse>
   }
 
-  request<T = any>(config: AxiosConfig): AxiosPromise<T>
+  request<T = any>(config: AxiosRequestConfig): AxiosPromise<T>
 
-  get<T = any>(url: string, config?: AxiosConfig): AxiosPromise<T>
+  get<T = any>(url: string, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  delete<T = any>(url: string, config?: AxiosConfig): AxiosPromise<T>
+  delete<T = any>(url: string, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  head<T = any>(url: string, config?: AxiosConfig): AxiosPromise<T>
+  head<T = any>(url: string, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  options<T = any>(url: string, config?: AxiosConfig): AxiosPromise<T>
+  options<T = any>(url: string, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  post<T = any>(url: string, data?: any, config?: AxiosConfig): AxiosPromise<T>
+  post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  put<T = any>(url: string, data?: any, config?: AxiosConfig): AxiosPromise<T>
+  put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  patch<T = any>(url: string, data?: any, config?: AxiosConfig): AxiosPromise<T>
+  patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  getUri(config?: AxiosConfig): string
+  getUri(config?: AxiosRequestConfig): string
 }
 
 export interface AxiosInstance extends Axios {
-  <T = any>(config: AxiosConfig): AxiosPromise<T>
+  <T = any>(config: AxiosRequestConfig): AxiosPromise<T>
 
-  <T = any>(url: string, config?: AxiosConfig): AxiosPromise<T>
+  <T = any>(url: string, config?: AxiosRequestConfig): AxiosPromise<T>
 }
-export interface AxiosStatic extends AxiosInstance{
-  create(config?: AxiosConfig): AxiosInstance
+
+export interface AxiosClassStatic {
+  new (config: AxiosRequestConfig): Axios
 }
+
+export interface AxiosStatic extends AxiosInstance {
+  create(config?: AxiosRequestConfig): AxiosInstance
+
+  CancelToken: CancelTokenStatic
+  Cancel: CancelStatic
+  isCancel: (value: any) => boolean
+
+  all<T>(promises: Array<T | Promise<T>>): Promise<T[]>
+
+  spread<T, R>(callback: (...args: T[]) => R): (arr: T[]) => R
+
+  Axios: AxiosClassStatic
+}
+
 export interface AxiosInterceptorManager<T> {
-  use(resolve: ResolveFn<T>, reject?: RejectFn):number
+  use(resolved: ResolvedFn<T>, rejected?: RejectedFn): number
+
   eject(id: number): void
 }
 
-export interface ResolveFn<T> {
+export interface ResolvedFn<T> {
   (val: T): T | Promise<T>
 }
 
-export interface RejectFn {
+export interface RejectedFn {
   (error: any): any
 }
 
-export interface CancelToken {
-  promise: Promise<string>
-  reason?: string
+export interface AxiosTransformer {
+  (data: any, headers?: any): any
 }
-export interface Cancelr {
+
+export interface CancelToken {
+  promise: Promise<Cancel>
+  reason?: Cancel
+
+  throwIfRequested(): void
+}
+
+export interface Canceler {
   (message?: string): void
 }
 
 export interface CancelExecutor {
-  (cancle: Cancelr): void
+  (cancel: Canceler): void
 }
 
 export interface CancelTokenSource {
   token: CancelToken
-  cancel: Cancelr
+  cancel: Canceler
 }
 
-export interface CancelTOkenStatic {
-  new(executor: CancelExecutor):CancelToken
+export interface CancelTokenStatic {
+  new (executor: CancelExecutor): CancelToken
 
   source(): CancelTokenSource
+}
+
+export interface Cancel {
+  message?: string
+}
+
+export interface CancelStatic {
+  new (message?: string): Cancel
+}
+
+export interface AxiosBasicCredentials {
+  username: string
+  password: string
 }

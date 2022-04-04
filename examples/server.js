@@ -53,7 +53,7 @@ registerInterceptorRouter()
 
 registerConfigRouter()
 
-registerCancelRouter()
+registerCancelerouter()
 
 registerMoreRouter()
 
@@ -171,7 +171,7 @@ function registerConfigRouter () {
   })
 }
 
-function registerCancelRouter () {
+function registerCancelerouter () {
   router.get('/cancel/get', function(req, res) {
     setTimeout(() => {
       res.json('hello')

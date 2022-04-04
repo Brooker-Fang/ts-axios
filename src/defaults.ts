@@ -1,15 +1,15 @@
-import { AxiosConfig } from './types'
+import { AxiosRequestConfig } from './types'
+import { processHeaders } from './helpers/headers'
 import { transformRequest, transformResponse } from './helpers/data'
-import { processHeaders } from './helpers/hearders'
 
-const defaults: AxiosConfig = {
+const defaults: AxiosRequestConfig = {
   method: 'get',
 
   timeout: 0,
 
-  // xsrfCookieName: 'XSRF-TOKEN',
+  xsrfCookieName: 'XSRF-TOKEN',
 
-  // xsrfHeaderName: 'X-XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
 
   headers: {
     common: {
@@ -30,9 +30,9 @@ const defaults: AxiosConfig = {
     }
   ],
 
-  // validateStatus(status: number): boolean {
-  //   return status >= 200 && status < 300
-  // }
+  validateStatus(status: number): boolean {
+    return status >= 200 && status < 300
+  }
 }
 
 const methodsNoData = ['delete', 'get', 'head', 'options']

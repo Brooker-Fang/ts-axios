@@ -1,28 +1,46 @@
-import { transformRequest, transformResponse } from "../helpers/data";
-import { flattenHeaders, processHeaders } from "../helpers/hearders";
-import { buildURL } from "../helpers/url";
-import { AxiosConfig, AxiosPromise, AxiosResponse } from "../types";
-import transform from "./transform";
-import xhr from "./xhr";
+import { AxiosPromise, AxiosRequestConfig, AxiosResponse } from '../types'
+import xhr from './xhr'
+import { buildURL, isAbsoluteURL, combineURL } from '../helpers/url'
+import { flattenHeaders } from '../helpers/headers'
+import transform from './transform'
 
-function dispatchRequest(config: AxiosConfig):AxiosPromise {
+export default function dispatchRequest(config: AxiosRequestConfig): AxiosPromise {
+  throwIfCancellationRequested(config)
   processConfig(config)
-  return xhr(config).then((res) => {
-    return transformResponseData(res)
-  })
+  return xhr(config).then(
+    res => {
+      return transformResponseData(res)
+    },
+    e => {
+      if (e && e.response) {
+        e.response = transformResponseData(e.response)
+      }
+      return Promise.reject(e)
+    }
+  )
 }
 
-function processConfig(config: AxiosConfig):void {
+function processConfig(config: AxiosRequestConfig): void {
   config.url = transformURL(config)
   config.data = transform(config.data, config.headers, config.transformRequest)
   config.headers = flattenHeaders(config.headers, config.method!)
 }
-function transformURL(config: AxiosConfig):string {
-  const { url, params } = config
-  return buildURL(url!, params)
+
+export function transformURL(config: AxiosRequestConfig): string {
+  let { url, params, paramsSerializer, baseURL } = config
+  if (baseURL && !isAbsoluteURL(url!)) {
+    url = combineURL(baseURL, url)
+  }
+  return buildURL(url!, params, paramsSerializer)
 }
-function transformResponseData(res: AxiosResponse):AxiosResponse {
+
+function transformResponseData(res: AxiosResponse): AxiosResponse {
   res.data = transform(res.data, res.headers, res.config.transformResponse)
   return res
 }
-export default dispatchRequest
+
+function throwIfCancellationRequested(config: AxiosRequestConfig): void {
+  if (config.cancelToken) {
+    config.cancelToken.throwIfRequested()
+  }
+}
