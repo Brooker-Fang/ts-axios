@@ -19,6 +19,8 @@ export interface AxiosConfig {
   timeout?: number
   transformRequest?: AxiosTransformer | AxiosTransformer[]
   transformResponse?: AxiosTransformer | AxiosTransformer[]
+
+  cancelToken?: CancelToken
   [propName: string]: any
 }
 
@@ -86,4 +88,27 @@ export interface ResolveFn<T> {
 
 export interface RejectFn {
   (error: any): any
+}
+
+export interface CancelToken {
+  promise: Promise<string>
+  reason?: string
+}
+export interface Cancelr {
+  (message?: string): void
+}
+
+export interface CancelExecutor {
+  (cancle: Cancelr): void
+}
+
+export interface CancelTokenSource {
+  token: CancelToken
+  cancel: Cancelr
+}
+
+export interface CancelTOkenStatic {
+  new(executor: CancelExecutor):CancelToken
+
+  source(): CancelTokenSource
 }

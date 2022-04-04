@@ -4,7 +4,7 @@ import { AxiosConfig, AxiosPromise, AxiosResponse } from "../types";
 
 export default function xhr(config: AxiosConfig) :AxiosPromise {
   return new Promise((resolve, reject) => {
-    const { data, url, method = 'get', headers, responseType, timeout } = config
+    const { data, url, method = 'get', headers, responseType, timeout, cancelToken } = config
 
   const request = new XMLHttpRequest()
 
@@ -53,6 +53,12 @@ export default function xhr(config: AxiosConfig) :AxiosPromise {
     } 
     request.setRequestHeader(name, headers[name])
   })
+  if(cancelToken) {
+    cancelToken.promise.then(reason => {
+      request.abort()
+      reject(reason)
+    })
+  }
   request.send(data)
   })
   
